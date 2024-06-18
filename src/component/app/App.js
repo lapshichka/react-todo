@@ -34,6 +34,13 @@ export default class App extends Component {
       };
     });
   };
+  deleteCompletedTasks = () => {
+    this.setState(({ data }) => {
+      return {
+        data: data.filter(({ completed }) => !completed),
+      };
+    });
+  };
 
   addItem = (text) => {
     const newItem = this.createTodoItem(text);
@@ -87,6 +94,7 @@ export default class App extends Component {
           onToggleDone={this.onToggleDone}
           filter={filter}
           onFilterChange={this.onFilterChange}
+          deleteCompletedTasks={this.deleteCompletedTasks}
         />
       </section>
     );
