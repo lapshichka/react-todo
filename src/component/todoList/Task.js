@@ -1,21 +1,8 @@
 import React, { Component } from 'react';
 
 export default class Task extends Component {
-  state = {
-    completed: false,
-    editing: false,
-  };
-  onDescriptionClick = () => {
-    this.setState((state) => {
-      return {
-        completed: !state.completed,
-      };
-    });
-  };
-
   render() {
-    const { description, created, onDeleted } = this.props;
-    const { completed, editing } = this.state;
+    const { description, created, completed, onDeleted, onToggleDone } = this.props;
 
     let className = 'view';
     if (completed) {
@@ -27,7 +14,7 @@ export default class Task extends Component {
         <input class='toggle' type='checkbox' />
 
         <label>
-          <span class='description' onClick={this.onDescriptionClick}>
+          <span class='description' onClick={onToggleDone}>
             {description}
           </span>
           <span class='created'>created {created} seconds ago</span>
