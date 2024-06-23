@@ -5,9 +5,9 @@ import './footer.css';
 const Footer = ({ itemsLeft, filter, onFilterChange, deleteCompletedTasks }) => {
   return (
     <footer className='footer'>
-      <span class='todo-count'>{itemsLeft} items left</span>
+      <span className='todo-count'>{itemsLeft} items left</span>
       <TasksFilter filter={filter} onFilterChange={onFilterChange} />
-      <button class='clear-completed' onClick={deleteCompletedTasks}>Clear completed</button>
+      <button className='clear-completed' onClick={deleteCompletedTasks}>Clear completed</button>
     </footer>
   );
 };

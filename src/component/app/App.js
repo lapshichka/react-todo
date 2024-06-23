@@ -19,7 +19,7 @@ export default class App extends Component {
     return {
       id: this.maxId++,
       description,
-      created: new Date().getSeconds(),
+      created: new Date().getTime(),
       completed: false,
     };
   }
@@ -86,7 +86,7 @@ export default class App extends Component {
     const visibleItems = this.filterItem(data, filter);
 
     return (
-      <section class='todoapp'>
+      <section className='todoapp'>
         <NewTaskForm data={data} onItemAddad={this.addItem} />
         <Main
           data={visibleItems}

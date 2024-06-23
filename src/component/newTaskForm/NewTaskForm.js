@@ -24,13 +24,13 @@ export default class NewTaskForm extends Component {
 
   render() {
     return (
-      <header class='header'>
+      <header className='header'>
         <h1>todos</h1>
         <form onSubmit={this.onSubmit}>
           <input
-            class='new-todo'
+            className='new-todo'
             placeholder='What needs to be done?'
-            autofocus
+            autoFocus
             onChange={this.onLabelChange}
             value={this.state.description}
           />
