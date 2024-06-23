@@ -2,8 +2,25 @@ import React, { Component } from 'react';
 import { formatDistanceToNow } from 'https://unpkg.com/date-fns/formatDistanceToNow.mjs';
 
 export default class Task extends Component {
+  state = {
+    date: formatDistanceToNow(this.props.created),
+  };
+
+  dateUpdate = () => {
+    setInterval(() => {
+      this.setState(({ date }) => {
+        console.log(date);
+        return {
+          date: formatDistanceToNow(this.props.created),
+        };
+      });
+    }, 60000);
+  };
+
   render() {
-    const { description, created, completed, onDeleted, onToggleDone } =
+    this.dateUpdate();
+
+    const { description, completed, onDeleted, onToggleDone } =
       this.props;
 
     let className = 'view';
@@ -19,9 +36,7 @@ export default class Task extends Component {
           <span className='description' onClick={onToggleDone}>
             {description}
           </span>
-          <span className='created'>
-            created {formatDistanceToNow(created)} ago
-          </span>
+          <span className='created'>created {this.state.date} ago</span>
         </label>
 
         <button className='icon icon-edit'></button>

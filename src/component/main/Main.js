@@ -18,7 +18,6 @@ export default class Main extends Component {
   };
 
   render() {
-    console.log(React.Children.count());
     const {
       data,
       onDeleted,
