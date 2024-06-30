@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow } from 'date-fns'
+import { tr } from 'date-fns/locale'
 
 export default class Task extends Component {
   constructor(props) {
@@ -8,6 +9,7 @@ export default class Task extends Component {
     const {created} = props
     this.state = {
       date: formatDistanceToNow(new Date(created)),
+      isChecked: false
     }
   }
 
@@ -20,12 +22,23 @@ export default class Task extends Component {
     }, 60000)
   }
 
+  handle = () => {
+    const { completed, id, onToggleDone } = this.props
+
+    onToggleDone(id)
+    if (completed) {
+      this.setState({ isChecked: false })
+    } else {
+      this.setState({ isChecked: true })
+    }
+  }
+
   render() {
     this.dateUpdate()
 
     const { id, description, completed, onDeleted, onToggleDone } = this.props
 
-    const { date } = this.state
+    const { date, isChecked } = this.state
 
     let className = 'view'
     if (completed) {
@@ -34,10 +47,11 @@ export default class Task extends Component {
 
     return (
       <div className={className}>
-        <input className="toggle" type="checkbox" checked={!!completed}/>
+        {/* checked={!!completed} */}
+        <input className="toggle" type="checkbox" onChange={this.handle} checked={isChecked} />
 
         <label htmlFor={`lable-${id}`}>
-          <span className="description" onClick={onToggleDone} aria-hidden='true'>
+          <span className="description" onClick={this.handle} aria-hidden='true'>
             {description}
           </span>
           <span className="created">created {date} ago</span>
