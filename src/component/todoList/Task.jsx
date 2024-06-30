@@ -7,14 +7,15 @@ export default class Task extends Component {
     super(props)
     const {created} = props
     this.state = {
-      date: formatDistanceToNow(created),
+      date: formatDistanceToNow(new Date(created)),
     }
   }
 
   dateUpdate = () => {
     setInterval(() => {
+      const {created} = this.props
       this.setState(({ date }) => ({
-          date: formatDistanceToNow(this.created),
+          date: formatDistanceToNow(new Date(created), new Date()),
         }))
     }, 60000)
   }
@@ -23,6 +24,7 @@ export default class Task extends Component {
     this.dateUpdate()
 
     const { id, description, completed, onDeleted, onToggleDone } = this.props
+
     const { date } = this.state
 
     let className = 'view'
@@ -32,7 +34,7 @@ export default class Task extends Component {
 
     return (
       <div className={className}>
-        <input className="toggle" type="checkbox" />
+        <input className="toggle" type="checkbox" checked={!!completed}/>
 
         <label htmlFor={`lable-${id}`}>
           <span className="description" onClick={onToggleDone} aria-hidden='true'>
