@@ -51,10 +51,13 @@ export default class Task extends Component {
         <input className="toggle" type="checkbox" onChange={this.handle} checked={isChecked} />
 
         <label htmlFor={`lable-${id}`}>
-          <span className="description" onClick={this.handle} aria-hidden='true'>
-            {description}
-          </span>
-          <span className="created">created {date} ago</span>
+          <span className="title" onClick={this.handle} aria-hidden='true'>{description}</span>
+            <span className="description">
+              <button type="button" aria-label='play' className="icon icon-play" />
+              <button type="button" aria-label='pause' className="icon icon-pause" />
+              12:25
+            </span>
+            <span className="description">created {date} ago</span>
         </label>
 
         <button type='button' aria-label='edit' className="icon icon-edit" />

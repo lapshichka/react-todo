@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import TaskList from '../todoList/TaskList'
-import Footer from '../footer/Footer'
+import TaskList from '../TaskList/TaskList'
+import Footer from '../Footer/Footer'
+import './Main.css'
+
 
 export default class Main extends Component {
   constructor() {

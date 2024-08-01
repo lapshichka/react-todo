@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import './newTaskForm.css'
+import './NewTaskForm.css'
 
 export default class NewTaskForm extends Component {
   constructor() {
@@ -33,17 +33,19 @@ export default class NewTaskForm extends Component {
     const {description} = this.state
 
     return (
-      <header className="header">
+      <header className="header new-todo-form">
         <h1>todos</h1>
-        <form onSubmit={this.onSubmit}>
+        <form className="new-todo-form" onSubmit={this.onSubmit}>
           <input
+            type='text'
             className="new-todo"
-            placeholder="What needs to be done?"
-            // autoFocus
+            placeholder="Task"
             onChange={this.onLabelChange}
             value={description}
           />
         </form>
+        <input type='text' className="new-todo-form__timer" placeholder="Min" />
+        <input type='text' className="new-todo-form__timer" placeholder="Sec" />
       </header>
     )
   }

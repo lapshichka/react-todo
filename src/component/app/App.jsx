@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import NewTaskForm from '../newTaskForm/NewTaskForm'
-import Main from '../main/Main'
-import './app.css'
+import NewTaskForm from '../NewTaskForm/NewTaskForm'
+import Main from '../Main/Main'
+import './App.css'
 
 export default class App extends Component {
   constructor() {
