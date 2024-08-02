@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { formatDistanceToNow } from 'date-fns'
-import { tr } from 'date-fns/locale'
+import { formatDistanceToNow, format } from 'date-fns'
 
 export default class Task extends Component {
   constructor(props) {
@@ -9,8 +8,26 @@ export default class Task extends Component {
     const {created} = props
     this.state = {
       date: formatDistanceToNow(new Date(created)),
-      isChecked: false
+      isChecked: false,
+      isRunning: false,
+      time: '00:00'
     }
+    this.seconds = new Date(0).getTime()
+    this.interval = null
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const {isRunning} = this.state
+
+    if (isRunning) {
+      this.interval = setInterval(this.activateTimer, 1000)
+    } else {
+      this.stopInterval()
+    }
+  }
+
+  componentWillUnmount() {
+    this.stopInterval()
   }
 
   dateUpdate = () => {
@@ -33,12 +50,27 @@ export default class Task extends Component {
     }
   }
 
+  activateTimer = () => {
+    if (this.interval) {
+      this.stopInterval()
+    }
+
+    const newTime = new Date(this.seconds)
+    newTime.setSeconds(newTime.getSeconds() + 1)
+    this.seconds = newTime.getTime()
+
+    this.setState({time: format(newTime, 'mm:ss')})
+  }
+
+  stopInterval = () => {
+    clearInterval(this.interval)
+  }
+
   render() {
     this.dateUpdate()
 
-    const { id, description, completed, onDeleted, onToggleDone } = this.props
-
-    const { date, isChecked } = this.state
+    const { id, description, completed, onDeleted } = this.props
+    const { date, isChecked, time, isRunning } = this.state
 
     let className = 'view'
     if (completed) {
@@ -53,9 +85,9 @@ export default class Task extends Component {
         <label htmlFor={`lable-${id}`}>
           <span className="title" onClick={this.handle} aria-hidden='true'>{description}</span>
             <span className="description">
-              <button type="button" aria-label='play' className="icon icon-play" />
-              <button type="button" aria-label='pause' className="icon icon-pause" />
-              12:25
+              <button type="button" aria-label='play' className="icon icon-play" onClick={() => this.setState({isRunning: true})} />
+              <button type="button" aria-label='pause' className="icon icon-pause" onClick={() => this.setState({isRunning: false})} />
+              {time}
             </span>
             <span className="description">created {date} ago</span>
         </label>
