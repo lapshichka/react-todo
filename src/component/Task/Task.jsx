@@ -5,15 +5,18 @@ import { formatDistanceToNow, format } from 'date-fns'
 export default class Task extends Component {
   constructor(props) {
     super(props)
-    const {created} = props
+    this.seconds = new Date()
+    this.interval = null
+
+    const {created, dateTime: {min, sec}} = props
+
     this.state = {
       date: formatDistanceToNow(new Date(created)),
       isChecked: false,
       isRunning: false,
-      time: '00:00'
+      time: this.setTime(min, sec),
+      isStartingFromZero: false
     }
-    this.seconds = new Date(0).getTime()
-    this.interval = null
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -22,12 +25,12 @@ export default class Task extends Component {
     if (isRunning) {
       this.interval = setInterval(this.activateTimer, 1000)
     } else {
-      this.stopInterval()
+      this.stopTimer()
     }
   }
 
   componentWillUnmount() {
-    this.stopInterval()
+    this.stopTimer()
   }
 
   dateUpdate = () => {
@@ -52,17 +55,46 @@ export default class Task extends Component {
 
   activateTimer = () => {
     if (this.interval) {
-      this.stopInterval()
+      this.stopTimer()
     }
+    const { isStartingFromZero, time } = this.state
+    const date = new Date(this.seconds)
 
-    const newTime = new Date(this.seconds)
-    newTime.setSeconds(newTime.getSeconds() + 1)
-    this.seconds = newTime.getTime()
+    if (time.includes('00:00')) {
+      this.setState({isStartingFromZero: true})
+      date.setSeconds(date.getSeconds() + 1)
+    } else if (!time.includes('00:00')) {
+      if (isStartingFromZero) {
+        date.setSeconds(date.getSeconds() + 1)
+        if (time.includes('59:59')) {
+          this.stopTimer()
+          this.setState({isRunning: false})
+        }
+      } else {
+        date.setSeconds(date.getSeconds() - 1)
+        if (time.includes('00:01')) {
+          this.stopTimer()
+          this.setState({isRunning: false})
+        }
+      }
+    }
+    
+    this.seconds = date.getTime()
 
-    this.setState({time: format(newTime, 'mm:ss')})
+    this.setState({time: format(date, 'mm:ss')})
   }
 
-  stopInterval = () => {
+  setTime = (min, sec) => {
+    const date = new Date(this.seconds)
+    date.setMinutes(min)
+    date.setSeconds(sec)
+
+    this.seconds = date.getTime()
+
+    return format(date, 'mm:ss')
+  }
+
+  stopTimer = () => {
     clearInterval(this.interval)
   }
 
@@ -70,7 +102,7 @@ export default class Task extends Component {
     this.dateUpdate()
 
     const { id, description, completed, onDeleted } = this.props
-    const { date, isChecked, time, isRunning } = this.state
+    const { date, isChecked, time, isRunning, isStartingFromZero } = this.state
 
     let className = 'view'
     if (completed) {
@@ -85,8 +117,10 @@ export default class Task extends Component {
         <label htmlFor={`lable-${id}`}>
           <span className="title" onClick={this.handle} aria-hidden='true'>{description}</span>
             <span className="description">
-              <button type="button" aria-label='play' className="icon icon-play" onClick={() => this.setState({isRunning: true})} />
-              <button type="button" aria-label='pause' className="icon icon-pause" onClick={() => this.setState({isRunning: false})} />
+              {isRunning
+                ? <button type="button" aria-label='pause' className="icon icon-pause" onClick={() => this.setState({isRunning: false})} />
+                : <button type="button" aria-label='play' className="icon icon-play" onClick={() => this.setState({isRunning: true})} />
+              }
               {time}
             </span>
             <span className="description">created {date} ago</span>
@@ -105,4 +139,14 @@ Task.propTypes = {
   completed: PropTypes.bool.isRequired,
   onDeleted: PropTypes.func.isRequired,
   onToggleDone: PropTypes.func.isRequired,
+  dateTime: PropTypes.shape({
+    min: PropTypes.number,
+    sec: PropTypes.number,
+  }),
+}
+Task.defaultProps = {
+  dateTime: {
+    min: 0,
+    sec: 0
+  }
 }

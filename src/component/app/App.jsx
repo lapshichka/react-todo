@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
-import NewTaskForm from '../NewTaskForm/NewTaskForm'
+import { format } from 'date-fns'
 import Main from '../Main/Main'
+import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import './App.css'
+
 
 export default class App extends Component {
   constructor() {
@@ -9,9 +11,9 @@ export default class App extends Component {
     this.maxId = 100
     this.state = {
       data: [
-        this.createTodoItem('Completed task'),
-        this.createTodoItem('Editing task'),
-        this.createTodoItem('Active task'),
+        this.createTodoItem('Completed task', 0, 0),
+        this.createTodoItem('Editing task', 0, 0),
+        this.createTodoItem('Active task', 0, 0),
       ],
       filter: 'all',
     }
@@ -63,21 +65,25 @@ export default class App extends Component {
       }))
   }
 
-  addItem = (text) => {
-    const newItem = this.createTodoItem(text)
+  addItem = (text, min, sec) => {
+    const newItem = this.createTodoItem(text, min, sec)
 
     this.setState(({ data }) => ({
         data: [...data, newItem],
       }))
   }
   
-  createTodoItem(description) {
+  createTodoItem(description, min, sec) {
     this.maxId += 1
     return {
       id: this.maxId,
       description,
       created: new Date().getTime(),
       completed: false,
+      time: {
+        min,
+        sec
+      }
     }
   }
 
