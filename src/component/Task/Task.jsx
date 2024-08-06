@@ -7,6 +7,7 @@ export default class Task extends Component {
     super(props)
     this.seconds = new Date()
     this.interval = null
+    this.dateInterval = null
 
     const {created, dateTime: {min, sec}} = props
 
@@ -19,22 +20,27 @@ export default class Task extends Component {
     }
   }
 
+  componentDidMount() {
+    this.dateUpdate()
+  }
+
   componentDidUpdate(prevProps, prevState) {
     const {isRunning} = this.state
 
-    if (isRunning) {
-      this.interval = setInterval(this.activateTimer, 1000)
-    } else {
+    if (isRunning && !prevState.isRequired) {
+      this.startTimer()
+    } else if (isRunning && prevState.isRequired) {
       this.stopTimer()
     }
   }
 
   componentWillUnmount() {
     this.stopTimer()
+    clearInterval(this.dateInterval)
   }
 
   dateUpdate = () => {
-    setInterval(() => {
+    this.dateInterval = setInterval(() => {
       const {created} = this.props
       this.setState(({ date }) => ({
           date: formatDistanceToNow(new Date(created), new Date()),
@@ -54,16 +60,17 @@ export default class Task extends Component {
   }
 
   activateTimer = () => {
-    if (this.interval) {
-      this.stopTimer()
-    }
-    const { isStartingFromZero, time } = this.state
+    const { isStartingFromZero, time, isRunning } = this.state
     const date = new Date(this.seconds)
 
+    if (this.interval) clearInterval(this.interval)
+    if (!isRunning) return
+    
     if (time.includes('00:00')) {
       this.setState({isStartingFromZero: true})
       date.setSeconds(date.getSeconds() + 1)
-    } else if (!time.includes('00:00')) {
+    }
+    else if (!time.includes('00:00')) {
       if (isStartingFromZero) {
         date.setSeconds(date.getSeconds() + 1)
         if (time.includes('59:59')) {
@@ -94,13 +101,19 @@ export default class Task extends Component {
     return format(date, 'mm:ss')
   }
 
+  startTimer = () => {
+    if (this.interval) clearInterval(this.interval)
+    this.interval = setInterval(this.activateTimer, 1000)
+  }
+
   stopTimer = () => {
-    clearInterval(this.interval)
+    if (this.interval) {
+      clearInterval(this.interval)
+      this.interval = null
+    }
   }
 
   render() {
-    this.dateUpdate()
-
     const { id, description, completed, onDeleted } = this.props
     const { date, isChecked, time, isRunning, isStartingFromZero } = this.state
 

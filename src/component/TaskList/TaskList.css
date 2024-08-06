@@ -174,18 +174,15 @@
 	content: '✎';
 }
 
-.todo-list li .icon-play {
-	font-size: 18px;
-	width: 18px;
-	height: 18px;
-}
-.todo-list li .icon-pause {
-	font-size: 16px;
-}
-
+.todo-list li .icon-pause,
 .todo-list li .icon-play {
 	font-size: 15px;
+	width: 18px;
+	height: 18px;
 	font-weight: 700;
+}
+.todo-list li .icon-pause {
+	margin-bottom: 5px;
 }
 
 .icon-pause:after {

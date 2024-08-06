@@ -34,7 +34,7 @@ export default class NewTaskForm extends Component {
     const {description, min, sec} = this.state
     const {onItemAddad} = this.props
 
-    if (description || min || sec) {
+    if (description) {
       onItemAddad(description, min, sec)
       this.setState({
         description: '',
@@ -71,22 +71,22 @@ export default class NewTaskForm extends Component {
             type='number'
             max="59"
             className="new-todo-form__timer" 
-            placeholder="Min" 
+            placeholder="Min"
             onChange={this.onMinutChange}
             value={min}
             onKeyDown={this.handleKeyDown}
+            required
           />
 
-          <input 
+          <input
             type='number'
-            step={1}
-            size={10}
             max="60"
             className="new-todo-form__timer" 
-            placeholder="Sec" 
+            placeholder="Sec"
             onChange={this.onSecondChange}
             value={sec}
             onKeyDown={this.handleKeyDown}
+            required
           />
         </form>
       </header>
