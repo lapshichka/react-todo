@@ -38,9 +38,8 @@
 	padding-left: 16px;
 }
 
-.new-todo__submit {
-	background-color: #fff;
-	color: #cc9a9a;
-	font-weight: 700;
-	border: 0;
+.new-todo-form input[type="number"]::-webkit-inner-spin-button,
+.new-todo-form input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

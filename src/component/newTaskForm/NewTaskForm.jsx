@@ -24,7 +24,7 @@ export default class NewTaskForm extends Component {
     })
   }
 
-  onSecondsChange = (e) => {
+  onSecondChange = (e) => {
     this.setState({
       sec: e.target.value,
     })
@@ -34,8 +34,7 @@ export default class NewTaskForm extends Component {
     const {description, min, sec} = this.state
     const {onItemAddad} = this.props
 
-    if (description && min || sec) {
-      e.preventDefault()
+    if (description || min || sec) {
       onItemAddad(description, min, sec)
       this.setState({
         description: '',
@@ -45,20 +44,27 @@ export default class NewTaskForm extends Component {
     }
   }
 
+  handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      this.onSubmit()
+    }
+  }
+
   render() {
     const {description, min, sec} = this.state
 
     return (
       <header className="header new-todo-form">
         <h1>todos</h1>
-        <form id="form1" className="new-todo-form" onSubmit={this.onSubmit}>
+        <form className="new-todo-form">
           <input
             type='text'
             className="new-todo"
             placeholder="Task"
             onChange={this.onLabelChange}
             value={description}
-            form='form1'
+            onKeyDown={this.handleKeyDown}
           />
 
           <input
@@ -68,20 +74,20 @@ export default class NewTaskForm extends Component {
             placeholder="Min" 
             onChange={this.onMinutChange}
             value={min}
-            form='form1'
+            onKeyDown={this.handleKeyDown}
           />
 
           <input 
             type='number'
+            step={1}
+            size={10}
             max="60"
             className="new-todo-form__timer" 
             placeholder="Sec" 
-            onChange={this.onSecondsChange}
+            onChange={this.onSecondChange}
             value={sec}
-            form='form1'
+            onKeyDown={this.handleKeyDown}
           />
-
-          <input value="add" type="submit" className='new-todo__submit' />
         </form>
       </header>
     )
