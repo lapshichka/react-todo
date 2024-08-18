@@ -1,149 +1,103 @@
-import React, { Component } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow, format } from 'date-fns'
 
-export default class Task extends Component {
-  constructor(props) {
-    super(props)
-    this.seconds = new Date()
-    this.interval = null
-    this.dateInterval = null
+export default function Task({id, description, completed, onDeleted, created, dateTime: {min, sec}, onToggleDone}) {
+  const [date, setDate] = useState(formatDistanceToNow(new Date(created)))
+  const [isChecked, setIsChecked] = useState(false)
+  const [isRunning, setIsRunning] = useState(false)
+  const [time, setTime] = useState(format(new Date(0, 0, 0, 0, min, sec), 'mm:ss'))
+  const [isStartingFromZero, setIsStartingFromZero] = useState(false)
 
-    const {created, dateTime: {min, sec}} = props
+  useEffect(() => {
+    let dateInterval = null
 
-    this.state = {
-      date: formatDistanceToNow(new Date(created)),
-      isChecked: false,
-      isRunning: false,
-      time: this.setTime(min, sec),
-      isStartingFromZero: false
-    }
-  }
-
-  componentDidMount() {
-    this.dateUpdate()
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    const {isRunning} = this.state
-
-    if (isRunning && !prevState.isRequired) {
-      this.startTimer()
-    } else if (isRunning && prevState.isRequired) {
-      this.stopTimer()
-    }
-  }
-
-  componentWillUnmount() {
-    this.stopTimer()
-    clearInterval(this.dateInterval)
-  }
-
-  dateUpdate = () => {
-    this.dateInterval = setInterval(() => {
-      const {created} = this.props
-      this.setState(({ date }) => ({
-          date: formatDistanceToNow(new Date(created), new Date()),
-        }))
+    dateInterval = setInterval(() => {
+      setDate(formatDistanceToNow(new Date(created), new Date()))
     }, 60000)
-  }
-
-  handle = () => {
-    const { completed, id, onToggleDone } = this.props
-
-    onToggleDone(id)
-    if (completed) {
-      this.setState({ isChecked: false })
-    } else {
-      this.setState({ isChecked: true })
+    return () => {
+      clearInterval(dateInterval)
     }
-  }
+  }, [created])
 
-  activateTimer = () => {
-    const { isStartingFromZero, time, isRunning } = this.state
-    const date = new Date(this.seconds)
+  useEffect(() => {
+    let interval = null
+    let seconds = 0
+    if (time === '00:00') setIsStartingFromZero(true)
 
-    if (this.interval) clearInterval(this.interval)
-    if (!isRunning) return
-    
-    if (time.includes('00:00')) {
-      this.setState({isStartingFromZero: true})
-      date.setSeconds(date.getSeconds() + 1)
-    }
-    else if (!time.includes('00:00')) {
-      if (isStartingFromZero) {
-        date.setSeconds(date.getSeconds() + 1)
-        if (time.includes('59:59')) {
-          this.stopTimer()
-          this.setState({isRunning: false})
-        }
-      } else {
-        date.setSeconds(date.getSeconds() - 1)
-        if (time.includes('00:01')) {
-          this.stopTimer()
-          this.setState({isRunning: false})
-        }
+    const activateTimer = () => {
+      if (!isRunning) return
+
+      const [minute, second] = time.split(':').map(Number)
+      seconds = minute * 60 + second
+
+      if(isStartingFromZero) {
+        seconds += 1
+      } else if (!isStartingFromZero) {
+        seconds -= 1
+      }
+
+      const newMin = Math.floor(seconds / 60)
+      const newSec = seconds % 60
+
+      const newTime = format(new Date(0, 0, 0, 0, newMin, newSec), 'mm:ss')
+      setTime(newTime)
+
+      if(newTime === '00:00' || (isStartingFromZero && newTime === '59:59')) {
+        setIsRunning(false)
+        clearInterval(interval)
       }
     }
-    
-    this.seconds = date.getTime()
 
-    this.setState({time: format(date, 'mm:ss')})
-  }
-
-  setTime = (min, sec) => {
-    const date = new Date(this.seconds)
-    date.setMinutes(min)
-    date.setSeconds(sec)
-
-    this.seconds = date.getTime()
-
-    return format(date, 'mm:ss')
-  }
-
-  startTimer = () => {
-    if (this.interval) clearInterval(this.interval)
-    this.interval = setInterval(this.activateTimer, 1000)
-  }
-
-  stopTimer = () => {
-    if (this.interval) {
-      clearInterval(this.interval)
-      this.interval = null
+    if (isRunning) {
+      if (interval) clearInterval(interval)
+      interval = setInterval(activateTimer, 1000)
+    } else if (!isRunning && interval) {
+      clearInterval(interval)
+      interval = null
     }
-  }
 
-  render() {
-    const { id, description, completed, onDeleted } = this.props
-    const { date, isChecked, time, isRunning, isStartingFromZero } = this.state
+    return () => {
+      clearInterval(interval)
+      interval = null
+    }
+  }, [isRunning, time, isStartingFromZero])
 
-    let className = 'view'
+  const handleToggle = () => {
+    onToggleDone(id)
     if (completed) {
-      className += ' completed'
+      setIsChecked(false)
+    } else {
+      setIsChecked(true)
     }
-
-    return (
-      <div className={className}>
-        {/* checked={!!completed} */}
-        <input className="toggle" type="checkbox" onChange={this.handle} checked={isChecked} />
-
-        <label htmlFor={`lable-${id}`}>
-          <span className="title" onClick={this.handle} aria-hidden='true'>{description}</span>
-            <span className="description">
-              {isRunning
-                ? <button type="button" aria-label='pause' className="icon icon-pause" onClick={() => this.setState({isRunning: false})} />
-                : <button type="button" aria-label='play' className="icon icon-play" onClick={() => this.setState({isRunning: true})} />
-              }
-              {time}
-            </span>
-            <span className="description">created {date} ago</span>
-        </label>
-
-        <button type='button' aria-label='edit' className="icon icon-edit" />
-        <button type='button' aria-label='delete' className="icon icon-destroy" onClick={onDeleted} />
-      </div>
-    )
   }
+
+  let className = 'view'
+  if (completed) {
+    className += ' completed'
+  }
+
+  return (
+    <div className={className}>
+      {/* checked={!!completed} */}
+      <input className="toggle" type="checkbox" onChange={handleToggle} checked={isChecked} />
+
+      <label htmlFor={`lable-${id}`}>
+        <span className="title" onClick={handleToggle} aria-hidden='true'>{description}</span>
+          <span className="description">
+            {isRunning
+              ? <button type="button" aria-label='pause' className="icon icon-pause" onClick={() => setIsRunning(false)} />
+              : <button type="button" aria-label='play' className="icon icon-play" onClick={() => setIsRunning(true)} />
+            }
+            {time}
+          </span>
+          <span className="description">created {date} ago</span>
+      </label>
+
+      <button type='button' aria-label='edit' className="icon icon-edit" />
+      <button type='button' aria-label='delete' className="icon icon-destroy" onClick={onDeleted} />
+    </div>
+  )
 }
 Task.propTypes = {
   id: PropTypes.number.isRequired,

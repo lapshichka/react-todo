@@ -1,82 +1,16 @@
-import React, { Component } from 'react'
-import { format } from 'date-fns'
+import React, { useState } from 'react'
 import Main from '../Main/Main'
 import NewTaskForm from '../NewTaskForm/NewTaskForm'
 import './App.css'
 
 
-export default class App extends Component {
-  constructor() {
-    super()
-    this.maxId = 100
-    this.state = {
-      data: [
-        this.createTodoItem('Completed task', 0, 0),
-        this.createTodoItem('Editing task', 0, 0),
-        this.createTodoItem('Active task', 0, 0),
-      ],
-      filter: 'all',
-    }
-  }
+export default function App() {
+  let maxId = 100
 
-  onFilterChange = (filter) => {
-    this.setState({ filter })
-  }
-
-  onToggleDone = (id) => {
-    this.setState(({ data }) => {
-      const idx = data.findIndex((el) => el.id === id)
-      const oldItem = data[idx]
-      const newItem = { ...oldItem, completed: !oldItem.completed }
-
-      return {
-        data: data.toSpliced(idx, 1, newItem),
-      }
-    })
-  }
-
-  filterItem = (items, filterName) => {
-    switch (filterName) {
-      case this.filter:
-        return items
-      case 'active':
-        return items.filter(({ completed }) => !completed)
-      case 'completed':
-        return items.filter(({ completed }) => completed)
-      default:
-        return items
-    }
-  }
-
-  deleteItem = (id) => {
-    this.setState(({ data }) => {
-      const idx = data.findIndex((el) => el.id === id)
-      const newArr = data.toSpliced(idx, 1)
-
-      return {
-        data: newArr,
-      }
-    })
-  }
-
-  deleteCompletedTasks = () => {
-    this.setState(({ data }) => ({
-        data: data.filter(({ completed }) => !completed),
-      }))
-  }
-
-  addItem = (text, min, sec) => {
-    const newItem = this.createTodoItem(text, min, sec)
-
-    this.setState(({ data }) => ({
-        data: [...data, newItem],
-      }))
-  }
-  
-  createTodoItem(description, min, sec) {
-    this.maxId += 1
+  function createTodoItem(description, min, sec) {
+    maxId += 1
     return {
-      id: this.maxId,
+      id: maxId,
       description,
       created: new Date().getTime(),
       completed: false,
@@ -87,25 +21,72 @@ export default class App extends Component {
     }
   }
 
-  render() {
-    const { data, filter } = this.state
+  const [data, setData] = useState([
+    createTodoItem('Completed task', 0, 0),
+    createTodoItem('Editing task', 0, 0),
+    createTodoItem('Active task', 0, 0),
+  ])
+  const [filter, setFilter] = useState('all')
+  
 
-    const visibleItems = this.filterItem(data, filter)
-    const itemsLeftCount = data.length - data.filter(({ completed }) => completed).length
-
-    return (
-      <section className='todoapp'>
-        <NewTaskForm data={data} onItemAddad={this.addItem} />
-        <Main
-          data={visibleItems}
-          onDeleted={this.deleteItem}
-          onToggleDone={this.onToggleDone}
-          filter={filter}
-          onFilterChange={this.onFilterChange}
-          deleteCompletedTasks={this.deleteCompletedTasks}
-          itemsLeft={itemsLeftCount}
-        />
-      </section>
-    )
+  const onFilterChange = (currentFilter) => {
+    setFilter(currentFilter)
   }
+
+  const onToggleDone = (id) => {
+    setData((prevData) => {
+      const idx = prevData.findIndex((el) => el.id === id)
+      const oldItem = prevData[idx]
+      const newItem = { ...oldItem, completed: !oldItem.completed }
+      return prevData.toSpliced(idx, 1, newItem)
+    })
+  }
+
+  const filterItem = (items, filterName) => {
+    switch (filterName) {
+      case 'all':
+        return items
+      case 'active':
+        return items.filter(({ completed }) => !completed)
+      case 'completed':
+        return items.filter(({ completed }) => completed)
+      default:
+        return items
+    }
+  }
+
+  const deleteItem = (id) => {
+    setData((prevData) => {
+      const idx = prevData.findIndex((el) => el.id === id)
+      return prevData.toSpliced(idx, 1)
+    })
+  }
+
+  const deleteCompletedTasks = () => {
+    setData((prevData) => prevData.filter(({ completed }) => !completed))
+  }
+
+  const addItem = (text, min, sec) => {
+    const newItem = createTodoItem(text, min, sec)
+
+    setData((prevData) => [...prevData, newItem])
+  }
+
+  const visibleItems = filterItem(data, filter)
+  const itemsLeftCount = data.length - data.filter(({ completed }) => completed).length
+
+  return (
+    <section className='todoapp'>
+      <NewTaskForm data={data} onItemAddad={addItem} />
+      <Main
+        data={visibleItems}
+        onDeleted={deleteItem}
+        onToggleDone={onToggleDone}
+        filter={filter}
+        onFilterChange={onFilterChange}
+        deleteCompletedTasks={deleteCompletedTasks}
+        itemsLeft={itemsLeftCount}
+      />
+    </section>
+  )
 }
