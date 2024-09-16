@@ -53,8 +53,9 @@
 
 .edit {
 	position: relative;
-	margin: 0;
-	width: 100%;
+	margin-left: 50px;
+	width: 91%;
+	min-height: 58.8px;
 	font-size: 24px;
 	font-family: inherit;
 	font-weight: inherit;
@@ -193,9 +194,9 @@
 	content: '▶';
 }
 
-.todo-list li .edit {
+/* .todo-list li .edit {
 	display: none;
-}
+} */
 
 .todo-list li.editing:last-child {
 	margin-bottom: -1px;

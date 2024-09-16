@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { formatDistanceToNow, format } from 'date-fns'
 
-export default function Task({id, description, completed, onDeleted, created, dateTime: {min, sec}, onToggleDone}) {
+export default function Task({
+  id,
+  description,
+  completed,
+  isEditing,
+  onDeleted,
+  created,
+  dateTime: {min, sec},
+  onToggleDone,
+  onToggleEditing,
+  editItem}) {
+
   const [date, setDate] = useState(formatDistanceToNow(new Date(created)))
   const [isChecked, setIsChecked] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
@@ -77,25 +88,44 @@ export default function Task({id, description, completed, onDeleted, created, da
     className += ' completed'
   }
 
+  const [changedDescription, setChangedDescription] = useState(description)
+
+  const onDescriptionChange = (e) => {
+    setChangedDescription(e.target.value)
+  }
+
+  const onSubmit = (i, e) => {
+    e.preventDefault()
+    editItem(i, changedDescription)
+    onToggleEditing(i)
+  }
+
   return (
     <div className={className}>
-      {/* checked={!!completed} */}
-      <input className="toggle" type="checkbox" onChange={handleToggle} checked={isChecked} />
+      {isEditing 
+      ? <form onSubmit={(e) => onSubmit(id, e)}>
+          <input type="text" className="edit" value={changedDescription} onChange={onDescriptionChange} />
+        </form>
 
-      <label htmlFor={`lable-${id}`}>
-        <span className="title" onClick={handleToggle} aria-hidden='true'>{description}</span>
-          <span className="description">
-            {isRunning
-              ? <button type="button" aria-label='pause' className="icon icon-pause" onClick={() => setIsRunning(false)} />
-              : <button type="button" aria-label='play' className="icon icon-play" onClick={() => setIsRunning(true)} />
-            }
-            {time}
-          </span>
-          <span className="description">created {date} ago</span>
-      </label>
+      : <div>
+        <input className="toggle" type="checkbox" onChange={handleToggle} checked={isChecked} />
 
-      <button type='button' aria-label='edit' className="icon icon-edit" />
-      <button type='button' aria-label='delete' className="icon icon-destroy" onClick={onDeleted} />
+          <label htmlFor={`lable-${id}`}>
+            <span className="title" onClick={handleToggle} aria-hidden='true'>{description}</span>
+              <span className="description">
+                {isRunning
+                  ? <button type="button" aria-label='pause' className="icon icon-pause" onClick={() => setIsRunning(false)} />
+                  : <button type="button" aria-label='play' className="icon icon-play" onClick={() => setIsRunning(true)} />
+                }
+                {time}
+              </span>
+              <span className="description">created {date} ago</span>
+          </label>
+    
+          <button type='button' aria-label='edit' className="icon icon-edit" onClick={onToggleEditing}/>
+          <button type='button' aria-label='delete' className="icon icon-destroy" onClick={onDeleted} />
+        </div>
+      }
     </div>
   )
 }
@@ -104,12 +134,15 @@ Task.propTypes = {
   description: PropTypes.string.isRequired,
   created: PropTypes.number.isRequired,
   completed: PropTypes.bool.isRequired,
+  isEditing: PropTypes.bool.isRequired,
   onDeleted: PropTypes.func.isRequired,
   onToggleDone: PropTypes.func.isRequired,
+  onToggleEditing: PropTypes.func.isRequired,
   dateTime: PropTypes.shape({
     min: PropTypes.number,
     sec: PropTypes.number,
   }),
+  editItem: PropTypes.func.isRequired,
 }
 Task.defaultProps = {
   dateTime: {

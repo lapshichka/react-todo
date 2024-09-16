@@ -4,8 +4,7 @@
 }
 
 .new-todo,
-.new-todo-form .new-todo-form__timer,
-.edit {
+.new-todo-form .new-todo-form__timer {
 	position: relative;
 	margin: 0;
 	width: 100%;

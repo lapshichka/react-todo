@@ -5,10 +5,16 @@ import Footer from '../Footer/Footer'
 import './Main.css'
 
 
-export default function Main({ data, onDeleted, onToggleDone, filter, onFilterChange, deleteCompletedTasks, itemsLeft }) {
+export default function Main({ data, onDeleted, onToggleDone, filter, onFilterChange, deleteCompletedTasks, itemsLeft, onToggleEditing, editItem }) {
   return (
     <section className="main">
-      <TaskList todos={data} onDeleted={onDeleted} onToggleDone={onToggleDone} />
+      <TaskList
+        todos={data}
+        onDeleted={onDeleted}
+        onToggleDone={onToggleDone}
+        onToggleEditing={onToggleEditing}
+        editItem={editItem}
+      />
       <Footer
         itemsLeft={itemsLeft}
         filter={filter}
@@ -30,10 +36,12 @@ Main.propTypes = {
   ),
   onDeleted: PropTypes.func.isRequired,
   onToggleDone: PropTypes.func.isRequired,
+  onToggleEditing:  PropTypes.func.isRequired,
   filter: PropTypes.string.isRequired,
   onFilterChange: PropTypes.func.isRequired,
   deleteCompletedTasks: PropTypes.func.isRequired,
-  itemsLeft: PropTypes.number.isRequired
+  itemsLeft: PropTypes.number.isRequired,
+  editItem: PropTypes.func.isRequired,
 }
 Main.defaultProps = {
   data: []

@@ -14,6 +14,7 @@ export default function App() {
       description,
       created: new Date().getTime(),
       completed: false,
+      isEditing: false,
       time: {
         min,
         sec
@@ -38,6 +39,15 @@ export default function App() {
       const idx = prevData.findIndex((el) => el.id === id)
       const oldItem = prevData[idx]
       const newItem = { ...oldItem, completed: !oldItem.completed }
+      return prevData.toSpliced(idx, 1, newItem)
+    })
+  }
+
+  const onToggleEditing = (id) => {
+    setData((prevData) => {
+      const idx = prevData.findIndex((el) => el.id === id)
+      const oldItem = prevData[idx]
+      const newItem = { ...oldItem, isEditing: !oldItem.isEditing }
       return prevData.toSpliced(idx, 1, newItem)
     })
   }
@@ -72,6 +82,15 @@ export default function App() {
     setData((prevData) => [...prevData, newItem])
   }
 
+  const editItem = (id, text) => {
+    setData((prevData) => {
+      const idx = prevData.findIndex((el) => el.id === id)
+      const oldItem = prevData[idx]
+      const newItem = { ...oldItem, description: text }
+      return prevData.toSpliced(idx, 1, newItem)
+    })
+  }
+
   const visibleItems = filterItem(data, filter)
   const itemsLeftCount = data.length - data.filter(({ completed }) => completed).length
 
@@ -82,10 +101,12 @@ export default function App() {
         data={visibleItems}
         onDeleted={deleteItem}
         onToggleDone={onToggleDone}
+        onToggleEditing={onToggleEditing}
         filter={filter}
         onFilterChange={onFilterChange}
         deleteCompletedTasks={deleteCompletedTasks}
         itemsLeft={itemsLeftCount}
+        editItem={editItem}
       />
     </section>
   )
