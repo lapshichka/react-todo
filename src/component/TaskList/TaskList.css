@@ -53,8 +53,9 @@
 
 .edit {
 	position: relative;
-	margin: 0;
-	width: 100%;
+	margin-left: 50px;
+	width: 91%;
+	min-height: 58.8px;
 	font-size: 24px;
 	font-family: inherit;
 	font-weight: inherit;
@@ -174,18 +175,15 @@
 	content: '✎';
 }
 
-.todo-list li .icon-play {
-	font-size: 18px;
-	width: 18px;
-	height: 18px;
-}
-.todo-list li .icon-pause {
-	font-size: 16px;
-}
-
+.todo-list li .icon-pause,
 .todo-list li .icon-play {
 	font-size: 15px;
+	width: 18px;
+	height: 18px;
 	font-weight: 700;
+}
+.todo-list li .icon-pause {
+	margin-bottom: 5px;
 }
 
 .icon-pause:after {
@@ -196,9 +194,9 @@
 	content: '▶';
 }
 
-.todo-list li .edit {
+/* .todo-list li .edit {
 	display: none;
-}
+} */
 
 .todo-list li.editing:last-child {
 	margin-bottom: -1px;
