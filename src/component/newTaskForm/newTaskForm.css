@@ -37,3 +37,9 @@
 	width: 15%;
 	padding-left: 16px;
 }
+
+.new-todo-form input[type="number"]::-webkit-inner-spin-button,
+.new-todo-form input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
